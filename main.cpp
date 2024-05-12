@@ -130,9 +130,7 @@ void render(SDL_Renderer *rend){
     }
     SDL_RenderPresent(rend);
 }
-
 int main() {
-
     std::cout<<"Enter simulation Framerate (default:60): "<<std::endl;
     if (std::cin.peek() == '\n' || !(std::cin>>framerate)){
         framerate = 60.0;
