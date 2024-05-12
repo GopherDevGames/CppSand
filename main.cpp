@@ -1,25 +1,22 @@
-
-#include "SDL_error.h"
-#include "SDL_events.h"
-#include "SDL_mouse.h"
-#include "SDL_render.h"
-#include "SDL_timer.h"
-#include "SDL_video.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <cstring>
+#include <algorithm>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
+#include <cstdint>
 #include <iostream>
 #include <string>
-#include <cstdint>
 #include <chrono>
+
+const uint16_t size_multiplier = 2;
 
 const uint16_t WINDOW_DEFAULT_W = 1280;
 const uint16_t WINDOW_DEFAULT_H = 720;
 
+const uint32_t P_COUNT = (WINDOW_DEFAULT_H*WINDOW_DEFAULT_W)/size_multiplier;
+
 const uint8_t P_VOID = 0;
 const uint8_t P_SAND = 1;
 const uint8_t P_WATER = 2;
-const uint8_t P_AMOUNT = 3;
+const uint8_t P_TYPES_AMOUNT = 3;
 
 uint8_t temp_pixels[WINDOW_DEFAULT_H*WINDOW_DEFAULT_W];
 uint8_t pixels[WINDOW_DEFAULT_H*WINDOW_DEFAULT_W];
@@ -40,9 +37,9 @@ void set_pixel(uint16_t x,uint16_t y,uint8_t pixel){
     pixels[(x*WINDOW_DEFAULT_H)+y] = pixel;
 }
 
-#define P_DOWN get_temp_pixel(x, std::max(y-1,1))
-#define P_DOWN_LEFT get_temp_pixel(std::max(x-1,1), std::max(y-1,1))
-#define P_DOWN_RIGHT get_temp_pixel(std::min(x+1,WINDOW_DEFAULT_W-1), std::max(y-1,1))
+#define P_DOWN get_temp_pixel(x, static_cast<uint16_t>(std::max(y-1,1)))
+#define P_DOWN_LEFT get_temp_pixel(static_cast<uint16_t>(std::max(x-1,1)), static_cast<uint16_t>(std::max(y-1,1)))
+#define P_DOWN_RIGHT get_temp_pixel(static_cast<uint16_t>(std::min(x+1,WINDOW_DEFAULT_W-1)), static_cast<uint16_t>(std::max(y-1,1)))
 
 // GLobals
 bool is_drawing = false;
@@ -52,8 +49,10 @@ void run_logic(){
     if (is_drawing){
         int x, y;
         SDL_GetMouseState(&x, &y);
-        set_pixel(x, WINDOW_DEFAULT_H-y, P_SAND);
-        set_temp_pixel(x,WINDOW_DEFAULT_H-y,P_SAND);
+        y = WINDOW_DEFAULT_H-y;
+        uint16_t pos_x = std::min(static_cast<uint16_t>(x),WINDOW_DEFAULT_W);
+        uint16_t pos_y = std::min(static_cast<uint16_t>(y),WINDOW_DEFAULT_H);
+        set_pixel(pos_x,pos_y, P_SAND);
     }
 
     for (uint16_t x = 0; x<WINDOW_DEFAULT_W; x++){
@@ -83,16 +82,16 @@ void run_logic(){
 }
 
 //                         void   sand     water   invalid
-Uint8 colors_r[P_AMOUNT] = {0,200, 30};
-Uint8 colors_g[P_AMOUNT] = {0,150, 20};
-Uint8 colors_b[P_AMOUNT] = {0,50,255};
+Uint8 colors_r[P_TYPES_AMOUNT] = {0,200, 30};
+Uint8 colors_g[P_TYPES_AMOUNT] = {0,150, 20};
+Uint8 colors_b[P_TYPES_AMOUNT] = {0,50,255};
 
 void render(SDL_Renderer *rend){
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
     SDL_RenderClear(rend);
     for (int x = 0; x<WINDOW_DEFAULT_W; x++){
     for (int y = 0; y<WINDOW_DEFAULT_H; y++){
-        auto pixel = get_pixel(x, y);
+        auto pixel = get_pixel(static_cast<uint16_t>(x), static_cast<uint16_t>(y));
         if (pixel == P_VOID) continue;
         SDL_SetRenderDrawColor(rend, colors_r[pixel], colors_g[pixel], colors_b[pixel], 255);
         SDL_RenderDrawPoint(rend, x, WINDOW_DEFAULT_H-y);
@@ -126,10 +125,6 @@ int main() {
 
     printf("Values Initizalized!");
 
-    set_pixel(300, 500, P_SAND);
-    set_pixel(300, 510, P_SAND);
-    set_pixel(300, 515, P_SAND);
-
     int frames_passed = 0;
 
     while (!close) {
@@ -138,8 +133,8 @@ int main() {
 
         auto current_tick = std::chrono::high_resolution_clock::now();
         auto time_between_ticks = std::chrono::duration_cast<std::chrono::microseconds>(current_tick-last_tick).count();
-        auto delta = time_between_ticks/(1000.0*1000.0);
-        if (frames_passed%10==0) std::cout<<"FPS: "<<1.0/delta<<std::endl;
+        auto delta = static_cast<double>(time_between_ticks)/(1000.0*1000.0);
+        if (frames_passed%100==0) std::cout<<"FPS: "<<1.0/delta<<std::endl;
 
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
