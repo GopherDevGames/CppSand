@@ -13,13 +13,13 @@
 #include <cstdint>
 #include <chrono>
 
-#define WINDOW_DEFAULT_W 960
-#define WINDOW_DEFAULT_H 540
+const uint16_t WINDOW_DEFAULT_W = 1280;
+const uint16_t WINDOW_DEFAULT_H = 720;
 
-#define P_AMOUNT 3
-#define P_VOID 0
-#define P_SAND 1
-#define P_WATER 2
+const uint8_t P_VOID = 0;
+const uint8_t P_SAND = 1;
+const uint8_t P_WATER = 2;
+const uint8_t P_AMOUNT = 3;
 
 uint8_t temp_pixels[WINDOW_DEFAULT_H*WINDOW_DEFAULT_W];
 uint8_t pixels[WINDOW_DEFAULT_H*WINDOW_DEFAULT_W];
@@ -29,6 +29,9 @@ const auto framerate = 1.0/144.0;
 uint8_t get_pixel(uint16_t x,uint16_t y){
     return pixels[(x*WINDOW_DEFAULT_H)+y];
 }
+uint8_t get_temp_pixel(uint16_t x,uint16_t y){
+    return temp_pixels[(x*WINDOW_DEFAULT_H)+y];
+}
 void set_temp_pixel(uint16_t x,uint16_t y,uint8_t pixel){
     temp_pixels[(x*WINDOW_DEFAULT_H)+y] = pixel;
 }
@@ -37,9 +40,9 @@ void set_pixel(uint16_t x,uint16_t y,uint8_t pixel){
     pixels[(x*WINDOW_DEFAULT_H)+y] = pixel;
 }
 
-#define P_DOWN get_pixel(x, std::max(y-1,1))
-#define P_DOWN_LEFT get_pixel(std::max(x-1,1), std::max(y-1,1))
-#define P_DOWN_RIGHT get_pixel(std::min(x+1,WINDOW_DEFAULT_W-1), std::max(y-1,1))
+#define P_DOWN get_temp_pixel(x, std::max(y-1,1))
+#define P_DOWN_LEFT get_temp_pixel(std::max(x-1,1), std::max(y-1,1))
+#define P_DOWN_RIGHT get_temp_pixel(std::min(x+1,WINDOW_DEFAULT_W-1), std::max(y-1,1))
 
 // GLobals
 bool is_drawing = false;
