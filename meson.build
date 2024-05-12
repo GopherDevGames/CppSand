@@ -11,7 +11,8 @@ args+='-static'
 endif
 
 executable('CppSand',
-            'main.cpp',
+            include_directories : include_directories('.'),
+            sources:['main.cpp'],
             install : true,
             dependencies: [sdl2_dep],
             link_args: args)
