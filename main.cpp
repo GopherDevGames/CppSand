@@ -1,4 +1,3 @@
-#include "SDL_scancode.h"
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <cstdint>
@@ -6,7 +5,7 @@
 #include <string>
 #include <chrono>
 
-const uint16_t size_multiplier = 4;
+const uint16_t size_multiplier = 5;
 const uint16_t WINDOW_DEFAULT_W = (1280)/size_multiplier;
 const uint16_t WINDOW_DEFAULT_H = (720)/size_multiplier;
 const uint32_t P_COUNT = (WINDOW_DEFAULT_H*WINDOW_DEFAULT_W);
