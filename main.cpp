@@ -5,7 +5,7 @@
 #include <string>
 #include <chrono>
 
-const uint16_t size_multiplier = 5;
+const uint16_t size_multiplier = 4;
 const uint16_t WINDOW_DEFAULT_W = (1280)/size_multiplier;
 const uint16_t WINDOW_DEFAULT_H = (720)/size_multiplier;
 const uint32_t P_COUNT = (WINDOW_DEFAULT_H*WINDOW_DEFAULT_W);
@@ -52,14 +52,16 @@ bool random_50_50() {
 
 
 void run_logic(){
+    // Reset Placed Mask
+    memset(placed_mask,false,sizeof(placed_mask));
 
     if (is_drawing){
         int mouse_x, mouse_y;
         SDL_GetMouseState(&mouse_x, &mouse_y);
         mouse_y = WINDOW_DEFAULT_H-(mouse_y/size_multiplier);
         mouse_x/=size_multiplier;
-        uint16_t pos_x = std::min(static_cast<uint16_t>(mouse_x),WINDOW_DEFAULT_W);
-        uint16_t pos_y = std::min(static_cast<uint16_t>(mouse_y),WINDOW_DEFAULT_H);
+        uint16_t pos_x = static_cast<uint16_t>(std::max(std::min(mouse_x,static_cast<int>(WINDOW_DEFAULT_W)),1));
+        uint16_t pos_y = static_cast<uint16_t>(std::max(std::min(mouse_y,static_cast<int>(WINDOW_DEFAULT_H)),1));
         set_pixel(pos_x,pos_y, picked_type,false);
     }
 
@@ -102,8 +104,6 @@ void run_logic(){
         }
     }
     }
-    // Reset Placed Mask
-    memset(placed_mask,false,sizeof(placed_mask));
 }
 
 //                         void   sand     water   invalid
@@ -113,11 +113,11 @@ Uint8 colors_b[P_TYPES_AMOUNT] = {0,50,255};
 
 void render(SDL_Renderer *rend){
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-    SDL_RenderClear(rend);
+    //SDL_RenderClear(rend);
     for (int x = 0; x<WINDOW_DEFAULT_W; x++){
     for (int y = 0; y<WINDOW_DEFAULT_H; y++){
         auto pixel = get_pixel(static_cast<uint16_t>(x), static_cast<uint16_t>(y));
-        if (pixel == P_VOID) continue; // Don't render empty pixels, bonus optimization
+        if (!get_placed_mask(x, y)) continue; // Don't render pixels that didn't change
         SDL_Point points[size_multiplier*size_multiplier];
         for (int size_w = 0; size_w < size_multiplier; size_w++){
         for (int size_h = 0; size_h < size_multiplier; size_h++){
