@@ -1,3 +1,5 @@
+mkdir subprojects
+meson wrap install sdl2
 meson setup --cross-file x86_64-w64-mingw32.txt build-mingw --wipe
 meson compile -C build-mingw --clean
 meson configure build-mingw  -Dstrip=true
