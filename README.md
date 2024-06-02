@@ -27,6 +27,9 @@ The project is seperated into multiple files.
 
 `Globals.h` - Holds various constants, not the best way to do it but having all of the important data in one file greatly increases the ease of adding and modyfing particle data.
 
+While most of the files are simple `.h` files, splitting them into multiple `.cpp` files might be required to make maintaining them a bit easier.
+
+## About Code
 
 The main plan behind this project is to minimize technical debt, while keeping the core project extendable and portable.
 
