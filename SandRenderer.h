@@ -85,7 +85,6 @@ public:
         mouse_y = std::max(mouse_y,2);
         sand_sim.mouse_pos_x = static_cast<uint16_t>(mouse_x);
         sand_sim.mouse_pos_y = static_cast<uint16_t>(mouse_y);
-        std::cout<<static_cast<uint16_t>(mouse_y)<<std::endl;
 
         sand_sim.run_logic();
         return true;
